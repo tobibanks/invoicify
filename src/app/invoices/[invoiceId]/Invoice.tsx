@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { ChevronDown, CreditCard, Ellipsis, Trash2 } from "lucide-react";
 import { useOptimistic } from "react";
 import Container from "@/components/Container";
@@ -36,20 +37,21 @@ interface InvoiceProps {
 export default function Invoice({ invoice }: InvoiceProps) {
   const [currentStatus, setCurrentStatus] = useOptimistic(
     invoice.status,
-    (_state, newStatus) => {
-      return String(newStatus);
-    },
+    (_state, newStatus) => String(newStatus)
   );
 
   async function handleOnUpdateStatus(formData: FormData) {
     const originalStatus = currentStatus;
-    setCurrentStatus(formData.get("status"));
+    const newStatus = formData.get("status");
+    setCurrentStatus(newStatus);
+
     try {
       await updateStatusAction(formData);
     } catch {
       setCurrentStatus(originalStatus);
     }
   }
+
   return (
     <main className="w-full h-full">
       <Container>
@@ -82,17 +84,25 @@ export default function Invoice({ invoice }: InvoiceProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {AVAILABLE_STATUSES.map((status) => {
-                  return (
-                    <DropdownMenuItem key={status.id}>
-                      <form action={handleOnUpdateStatus}>
-                        <input type="hidden" name="id" value={invoice.id} />
-                        <input type="hidden" name="status" value={status.id} />
-                        <button type="submit">{status.label}</button>
-                      </form>
-                    </DropdownMenuItem>
-                  );
-                })}
+                {AVAILABLE_STATUSES.map((status) => (
+                  <DropdownMenuItem key={status.id}>
+                    <form>
+                      <input type="hidden" name="id" value={invoice.id} />
+                      <input type="hidden" name="status" value={status.id} />
+                      <button
+                        type="submit"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          const form = e.currentTarget.form;
+                          if (!form) return;
+                          await handleOnUpdateStatus(new FormData(form));
+                        }}
+                      >
+                        {status.label}
+                      </button>
+                    </form>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -142,7 +152,10 @@ export default function Invoice({ invoice }: InvoiceProps) {
                   <DialogFooter>
                     <form
                       className="flex justify-center"
-                      action={deleteInvoiceAction}
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        await deleteInvoiceAction(new FormData(e.currentTarget));
+                      }}
                     >
                       <input type="hidden" name="id" value={invoice.id} />
                       <Button

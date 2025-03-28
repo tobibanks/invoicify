@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import Invoice from '../invoices/[invoiceId]/Invoice';
 
 export default async function Home() {
   const { userId, orgId } = auth();
@@ -80,6 +81,7 @@ export default async function Home() {
               <TableHead className="p-4">Customer</TableHead>
               <TableHead className="p-4">Email</TableHead>
               <TableHead className="text-center p-4">Status</TableHead>
+              <TableHead className="text-center p-4">Description</TableHead>
               <TableHead className="text-right p-4">Value</TableHead>
             </TableRow>
           </TableHeader>
@@ -121,6 +123,14 @@ export default async function Home() {
                       >
                         {result.status}
                       </Badge>
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-left p-0">
+                    <Link
+                      href={`/invoices/${result.id}`}
+                      className="block p-4 text-wrap"
+                    >
+                      {result.description}
                     </Link>
                   </TableCell>
                   <TableCell className="text-right p-0">

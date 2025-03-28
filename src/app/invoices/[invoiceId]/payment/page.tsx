@@ -27,7 +27,7 @@ export default async function InvoicePage({
   params,
   searchParams,
 }: InvoicePageProps) {
-  const invoiceId = Number.parseInt(params.invoiceId);
+  const invoiceId = await Number.parseInt(params.invoiceId);
 
   const sessionId = searchParams.session_id;
   const isSuccess = sessionId && searchParams.status === "success";

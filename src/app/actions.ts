@@ -18,7 +18,7 @@ const stripe = new Stripe(String(process.env.STRIPE_API_SECRET));
 
 export async function createAction(formData: FormData) {
   const { userId, orgId } = auth();
-
+console.log('userId', userId);
   // Creation disabled for demo
   //if ( userId !== process.env.ME_ID ) return;
 
@@ -70,10 +70,10 @@ export async function createAction(formData: FormData) {
 }
 
 export async function updateStatusAction(formData: FormData) {
-  const { userId, orgId } = auth();
+  const { userId, orgId } =  auth();
 
   // Updating disabled for demo
-  if ( userId !== process.env.ME_ID ) return;
+ // if ( userId !== process.env.ME_ID ) return;
 
   if (!userId) {
     return;
@@ -112,7 +112,7 @@ export async function deleteInvoiceAction(formData: FormData) {
   const { userId, orgId } = auth();
 
   // Deleting disabled for demo
-  if ( userId !== process.env.ME_ID ) return;
+ // if ( userId !== process.env.ME_ID ) return;
 
   if (!userId) {
     return;
@@ -144,43 +144,151 @@ export async function deleteInvoiceAction(formData: FormData) {
   redirect("/dashboard");
 }
 
+// export async function createPayment(formData: FormData) {
+//   //console.log(formData)
+//   try {
+//     // Payments disabled for demo
+//     // const { userId } = auth();
+//     // if (!userId || userId !== process.env.ME_ID) {
+//     //   throw new Error("Unauthorized");
+//     // }
+
+//     // Get headers with timeout handling
+//     const headersList = await Promise.race([
+//       headers(),
+//       new Promise((_, reject) => 
+//         setTimeout(() => reject(new Error('Headers timeout')), 5000)
+//       )
+//     ]) as Headers;
+
+//     const origin = headersList.get("origin");
+//     //console.log('origin: ', origin);
+//     if (!origin) {
+//       throw new Error("Origin header not found");
+//     }
+
+//     const id = Number.parseInt(formData.get("id") as string);
+//     if (isNaN(id)) {
+//       throw new Error("Invalid invoice ID");
+//     }
+
+//     const [result] = await db
+//       .select({
+//         status: Invoices.status,
+//         value: Invoices.value,
+//       })
+//       .from(Invoices)
+//       .where(eq(Invoices.id, id))
+//       .limit(1);
+
+// //console.log('result: ', result);
+      
+//     if (!result) {
+//       throw new Error("Invoice not found");
+//     }
+
+//     const session = await stripe.checkout.sessions.create({
+//       line_items: [
+//         {
+//           price_data: {
+//             currency: "usd",
+//             product: "prod_RricaJpI9j2iQ2",
+//             unit_amount: result.value,
+//           },
+//           quantity: 1,
+//         },
+//       ],
+//       mode: "payment",
+//       success_url: `${origin}/invoices/${id}/payment?status=success&session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `${origin}/invoices/${id}/payment?status=canceled&session_id={CHECKOUT_SESSION_ID}`,
+//     });
+
+//     if (!session.url) {
+//       throw new Error("Invalid Session");
+//     }
+
+//     redirect(session.url);
+//   } catch (error) {
+//     console.error('Payment creation failed:', error);
+//     redirect(`/invoices/${formData.get("id")}/error`);
+//   }
+// }
+
 export async function createPayment(formData: FormData) {
-  // Payments disabled for demo
-  const { userId } = auth();
-  if ( userId !== process.env.ME_ID ) return;
+  try {
+    // Get the header without timeout - Next.js handles this internally
+    const headersList = await Promise.race([
+             headers(),
+             new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Headers timeout')), 5000)
+             )
+           ]) as Headers;
+    const origin = headersList.get("origin");
 
-  const headersList = headers();
-  const origin = headersList.get("origin");
-  const id = Number.parseInt(formData.get("id") as string);
+    if (!origin) {
+      throw new Error("Missing origin header");
+    }
 
-  const [result] = await db
-    .select({
-      status: Invoices.status,
-      value: Invoices.value,
-    })
-    .from(Invoices)
-    .where(eq(Invoices.id, id))
-    .limit(1);
+    // Parse and validate invoice ID
+    const rawId = formData.get("id");
+    if (!rawId) {
+      throw new Error("Missing invoice ID");
+    }
 
-  const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product: "prod_QusOUzstGsvmvf",
-          unit_amount: result.value,
+    const id = Number.parseInt(rawId as string);
+    if (isNaN(id)) {
+      throw new Error("Invalid invoice ID format");
+    }
+
+    // Get invoice details with status check
+    const [invoice] = await db
+      .select({
+        status: Invoices.status,
+        value: Invoices.value,
+      })
+      .from(Invoices)
+      .where(eq(Invoices.id, id))
+      .limit(1);
+
+    if (!invoice) {
+      throw new Error("Invoice not found");
+    }
+
+    if (invoice.status !== "open") {
+      throw new Error("Invoice cannot be paid");
+    }
+
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product: "prod_RricaJpI9j2iQ2",
+            unit_amount: invoice.value,
+          },
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      mode: "payment",
+      metadata: {
+        invoiceId: id,
       },
-    ],
-    mode: "payment",
-    success_url: `${origin}/invoices/${id}/payment?status=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/invoices/${id}/payment?status=canceled&session_id={CHECKOUT_SESSION_ID}`,
-  });
+      success_url: `${origin}/invoices/${id}/payment?status=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/invoices/${id}/payment?status=canceled`,
+    });
 
-  if (!session.url) {
-    throw new Error("Invalid Session");
+    if (!session?.url) {
+      throw new Error("Failed to create Stripe session");
+    }
+
+    return redirect(session.url);
+  } catch (error) {
+    console.error('Payment creation failed:', error);
+    
+    // Type-safe error message
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    
+    return redirect(`/invoices/${formData.get("id")}/error?message=${encodeURIComponent(errorMessage)}`);
   }
-
-  redirect(session.url);
 }
