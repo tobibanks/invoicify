@@ -14,7 +14,7 @@ import { headers } from "next/headers";
 import { InvoiceCreatedEmail } from "@/emails/invoice-created";
 
 const stripe = new Stripe(String(process.env.STRIPE_API_SECRET));
-//const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function createAction(formData: FormData) {
   const { userId, orgId } = auth();
@@ -59,12 +59,12 @@ console.log('userId', userId);
       id: Invoices.id,
     });
 
-  // await resend.emails.send({
-  //   from: "Space Jelly <info@test.spacejelly.dev>",
-  //   to: [email],
-  //   subject: "You Have a New Invoice",
-  //   react: InvoiceCreatedEmail({ invoiceId: results[0].id }),
-  // });
+  await resend.emails.send({
+    from: "BPZ<tobibanks@ymail.com>",
+    to: [email],
+    subject: "You Have a New Invoice",
+    react: InvoiceCreatedEmail({ invoiceId: results[0].id }),
+  });
 
   redirect(`/invoices/${results[0].id}`);
 }
@@ -144,75 +144,6 @@ export async function deleteInvoiceAction(formData: FormData) {
   redirect("/dashboard");
 }
 
-// export async function createPayment(formData: FormData) {
-//   //console.log(formData)
-//   try {
-//     // Payments disabled for demo
-//     // const { userId } = auth();
-//     // if (!userId || userId !== process.env.ME_ID) {
-//     //   throw new Error("Unauthorized");
-//     // }
-
-//     // Get headers with timeout handling
-//     const headersList = await Promise.race([
-//       headers(),
-//       new Promise((_, reject) => 
-//         setTimeout(() => reject(new Error('Headers timeout')), 5000)
-//       )
-//     ]) as Headers;
-
-//     const origin = headersList.get("origin");
-//     //console.log('origin: ', origin);
-//     if (!origin) {
-//       throw new Error("Origin header not found");
-//     }
-
-//     const id = Number.parseInt(formData.get("id") as string);
-//     if (isNaN(id)) {
-//       throw new Error("Invalid invoice ID");
-//     }
-
-//     const [result] = await db
-//       .select({
-//         status: Invoices.status,
-//         value: Invoices.value,
-//       })
-//       .from(Invoices)
-//       .where(eq(Invoices.id, id))
-//       .limit(1);
-
-// //console.log('result: ', result);
-      
-//     if (!result) {
-//       throw new Error("Invoice not found");
-//     }
-
-//     const session = await stripe.checkout.sessions.create({
-//       line_items: [
-//         {
-//           price_data: {
-//             currency: "usd",
-//             product: "prod_RricaJpI9j2iQ2",
-//             unit_amount: result.value,
-//           },
-//           quantity: 1,
-//         },
-//       ],
-//       mode: "payment",
-//       success_url: `${origin}/invoices/${id}/payment?status=success&session_id={CHECKOUT_SESSION_ID}`,
-//       cancel_url: `${origin}/invoices/${id}/payment?status=canceled&session_id={CHECKOUT_SESSION_ID}`,
-//     });
-
-//     if (!session.url) {
-//       throw new Error("Invalid Session");
-//     }
-
-//     redirect(session.url);
-//   } catch (error) {
-//     console.error('Payment creation failed:', error);
-//     redirect(`/invoices/${formData.get("id")}/error`);
-//   }
-// }
 
 export async function createPayment(formData: FormData) {
   // Payments disabled for demo
