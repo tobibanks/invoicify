@@ -1,24 +1,3 @@
 {
-  "root": true,
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "rules": {
-    "react/no-unescaped-entities": "off",
-    "@next/next/no-html-link-for-pages": "off"
-  },
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  },
-  "settings": {
-    "next": {
-      "rootDir": "src"
-    }
-  }
+  "extends": ["next/core-web-vitals", "next/typescript"]
 }
