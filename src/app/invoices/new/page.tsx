@@ -61,7 +61,7 @@ export default function Home() {
             <Label htmlFor="value" className="block font-semibold text-sm mb-2">
               Value
             </Label>
-            <Input id="value" name="value" type="text" />
+            <Input id="value" name="value" type="number" />
           </div>
           <div>
             <Label

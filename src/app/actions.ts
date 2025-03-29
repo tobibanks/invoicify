@@ -17,56 +17,72 @@ const stripe = new Stripe(String(process.env.STRIPE_API_SECRET));
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function createAction(formData: FormData) {
-  const { userId, orgId } = auth();
-console.log('userId', userId);
-  // Creation disabled for demo
-  //if ( userId !== process.env.ME_ID ) return;
+  try {
+    const { userId, orgId } = auth();
+    console.log('userId', userId);
 
-  if (!userId) {
-    return;
+    if (!userId) {
+      throw new Error('Unauthorized');
+    }
+
+    const value = Math.floor(
+      Number.parseFloat(String(formData.get("value"))) * 100,
+    );
+    const description = formData.get("description") as string;
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+
+    // Validate input
+    if (!value || !description || !name || !email) {
+      throw new Error('Missing required fields');
+    }
+
+    const [customer] = await db
+      .insert(Customers)
+      .values({
+        name,
+        email,
+        userId,
+        organizationId: orgId || null,
+      })
+      .returning({
+        id: Customers.id,
+      });
+
+    if (!customer) {
+      throw new Error('Failed to create customer');
+    }
+
+    const results = await db
+      .insert(Invoices)
+      .values({
+        value,
+        description,
+        userId,
+        customerId: customer.id,
+        status: "open",
+        organizationId: orgId || null,
+      })
+      .returning({
+        id: Invoices.id,
+      });
+
+    if (!results.length) {
+      throw new Error('Failed to create invoice');
+    }
+
+    await resend.emails.send({
+      from: "BPZ<tobi@tobiodogwu.xyz>",
+      to: [email],
+      subject: "You Have a New Invoice",
+      react: InvoiceCreatedEmail({ invoiceId: results[0].id }),
+    });
+
+    redirect(`/invoices/${results[0].id}`);
+  } catch (error) {
+    console.error('Error creating invoice:', error);
+    throw error;
   }
-
-  const value = Math.floor(
-    Number.parseFloat(String(formData.get("value"))) * 100,
-  );
-  const description = formData.get("description") as string;
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-
-  const [customer] = await db
-    .insert(Customers)
-    .values({
-      name,
-      email,
-      userId,
-      organizationId: orgId || null,
-    })
-    .returning({
-      id: Customers.id,
-    });
-
-  const results = await db
-    .insert(Invoices)
-    .values({
-      value,
-      description,
-      userId,
-      customerId: customer.id,
-      status: "open",
-      organizationId: orgId || null,
-    })
-    .returning({
-      id: Invoices.id,
-    });
-
-  await resend.emails.send({
-    from: "BPZ<tobibanks@ymail.com>",
-    to: [email],
-    subject: "You Have a New Invoice",
-    react: InvoiceCreatedEmail({ invoiceId: results[0].id }),
-  });
-
-  redirect(`/invoices/${results[0].id}`);
 }
 
 export async function updateStatusAction(formData: FormData) {
