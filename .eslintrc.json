@@ -1,7 +1,14 @@
 {
-  "extends": ["plugin:@next/next/recommended", "prettier"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@next/next/recommended",
+    "prettier"
+  ],
   "rules": {
     "react/no-unescaped-entities": "off",
     "@next/next/no-html-link-for-pages": "off"
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
   }
 }
