@@ -1,96 +1,167 @@
 
-# Invoicipedia - Next.js Invoicing Application
+# Invoicify - Modern Invoice Management System
 
-A modern invoicing application built with Next.js, allowing users to create and manage invoices with features like payment processing and email notifications.
+A professional invoicing application built with Next.js 14, featuring Stripe payments, email notifications, and organization management.
 
-## Features
+## Core Features
 
-- 🔐 Authentication with [Clerk](https://clerk.com)
+- 🔐 Authentication & Organizations with [Clerk](https://clerk.com)
 - 💳 Payment processing with [Stripe](https://stripe.com)
-- 📧 Email notifications using [React Email](https://react.email)
-- 🎨 UI components with [shadcn/ui](https://ui.shadcn.com)
-- 🗃️ PostgreSQL database with [Drizzle ORM](https://orm.drizzle.team)
+- 📧 Email notifications using [Resend](https://resend.com)
+- 🎨 UI components from [shadcn/ui](https://ui.shadcn.com)
+- 🗃️ PostgreSQL database with [Xata](https://xata.io)
+- 📊 Database migrations with [Drizzle ORM](https://orm.drizzle.team)
 - 🔄 Real-time status updates
-- 📱 Responsive design with Tailwind CSS
+- 📱 Responsive design with [Tailwind CSS](https://tailwindcss.com)
 
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/) - React framework
-- [TypeScript](https://www.typescriptlang.org/) - Type safety
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [PostgreSQL](https://www.postgresql.org/) - Database
-- [Drizzle ORM](https://orm.drizzle.team) - Database ORM
-- [Clerk](https://clerk.com) - Authentication
-- [Stripe](https://stripe.com) - Payment processing
-- [React Email](https://react.email) - Email templates
+### Frontend
+
+- **Next.js 14**: React framework with App Router
+- **Tailwind CSS**: Utility-first CSS framework
+- **shadcn/ui**: Re-usable components built with Radix UI
+- **Lucide React**: Beautiful icons
+- **React Email**: Email template components
+
+### Backend
+
+- **Clerk**: Authentication & organization management
+- **Stripe**: Payment processing
+- **Xata**: PostgreSQL database hosting
+- **Drizzle ORM**: Type-safe database queries
+- **Resend**: Email delivery service
 
 ## Getting Started
 
-1. Clone the repository:
+1. Clone and install dependencies:
 
 ```bash
 git clone <repository-url>
-cd invoicing-app
-```
-
-2. Install dependencies:
-
-```bash
+cd invoicify
 npm install
-# or
-yarn install
 ```
 
-3. Create a `.env.local` file in the root directory with the following variables:
+2. Set up environment variables:
 
-```
-XATA_DATABASE_URL=
-STRIPE_API_SECRET=
+```env
+# Authentication - Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=
+
+# Database - Xata
+XATA_DATABASE_URL=
+XATA_API_KEY=
+
+# Payments - Stripe
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+
+# Email - Resend
+RESEND_API_KEY=
 ```
 
-4. Set up the database:
+3. Initialize the database:
 
 ```bash
-npm run migrate
-# or
-yarn migrate
+npm run db:push
 ```
 
-5. Run the development server:
+4. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+## Key Features
+
+### Authentication & Organizations
+
+- User authentication with Clerk
+- Organization management
+- Role-based access control
+
+### Invoice Management
+
+- Create and edit invoices
+- Attach to organizations
+- Status tracking
+- PDF generation
+
+### Payments
+
+- Stripe Checkout integration
+- Multiple payment methods
+- Automatic status updates
+- Payment history
+
+### Email Notifications
+
+- React Email templates
+- Payment confirmations
+- Invoice reminders
+- Status updates
 
 ## Project Structure
 
-- `/src/app` - App router pages and layouts
-- `/src/components` - Reusable React components
-- `/src/db` - Database schema and migrations
-- `/src/emails` - Email templates
-- `/src/lib` - Utility functions
-- `/src/data` - Constants and data types
+```
+invoicify/
+├── src/
+│   ├── app/              # Next.js App Router pages
+│   ├── components/       # React components
+│   ├── db/              # Database schema and migrations
+│   ├── emails/          # Email templates
+│   ├── lib/             # Utility functions
+│   └── styles/          # Global styles
+├── public/              # Static assets
+└── drizzle/            # Database migrations
+```
 
-## Available Scripts
+## API Routes
 
-- `dev` - Start development server
-- `build` - Build for production
-- `start` - Start production server
-- `lint` - Run Biome linter
-- `format` - Format code with Biome
-- `generate` - Generate Drizzle migrations
-- `migrate` - Run database migrations
-- `email` - Start email preview server
+- `/api/webhooks/stripe`: Stripe webhook endpoint
+- `/api/webhooks/clerk`: Clerk webhook endpoint
+- `/api/invoices`: Invoice management
+- `/api/organizations`: Organization management
+
+## Development
+
+```bash
+# Run development server
+npm run dev
+
+# Type check
+npm run type-check
+
+# Format code
+npm run format
+
+# Lint code
+npm run lint
+
+# Run tests
+npm run test
+
+# Create database migration
+npm run db:generate
+
+# Push database changes
+npm run db:push
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a pull request
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

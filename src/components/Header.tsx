@@ -15,7 +15,7 @@ const Header = () => {
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-4">
             <p className="font-bold">
-              <Link href="/dashboard">Invoicipedia</Link>
+              <Link href="/dashboard">invoicify</Link>
             </p>
             <span className="text-slate-300">/</span>
             <SignedIn>
@@ -24,7 +24,7 @@ const Header = () => {
               </span>
             </SignedIn>
           </div>
-          <div>
+          <div className="px-3 py-1 border rounded-lg bg-black text-white text-sm">
             <SignedOut>
               <SignInButton />
             </SignedOut>
