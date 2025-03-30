@@ -1,47 +1,46 @@
 import { eq } from "drizzle-orm";
 import { Check, CreditCard } from "lucide-react";
 import Stripe from "stripe";
+import { notFound } from "next/navigation";
 
 import Container from "@/components/Container";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Customers, Invoices } from "@/db/schema";
 import { cn } from "@/lib/utils";
-
-import { Button } from "@/components/ui/button";
-
 import { createPayment, updateStatusAction } from "@/app/actions";
 import { db } from "@/db";
-import { notFound } from "next/navigation";
 
 const stripe = new Stripe(String(process.env.STRIPE_API_SECRET));
 
-interface InvoicePageProps {
-  params: { invoiceId: string };
-  searchParams: {
-    status: string;
-    session_id: string;
-  };
-}
 
-export default async function InvoicePage({
-  params,
-  searchParams,
-}: InvoicePageProps) {
+type Params = Promise<{
+    invoiceId: string;
+  }>;
+ type SearchParams = Promise<{
+    status?: string;
+    session_id?: string;
+  }>;
+
+
+export default async function InvoicePage( props:{
+  params: Params
+  searchParams: SearchParams
+}) {
+  
+  const params = await props.params
+  const searchParams = await props.searchParams
   const invoiceId = await Number.parseInt(params.invoiceId);
-
-  const sessionId = searchParams.session_id;
+  const sessionId = searchParams?.session_id;
   const isSuccess = sessionId && searchParams.status === "success";
-  const isCanceled = searchParams.status === "canceled";
+  const isCanceled = searchParams?.status === "canceled";
   let isError = isSuccess && !sessionId;
-
-  console.log("isSuccess", isSuccess);
-  console.log("isCanceled", isCanceled);
 
   if (Number.isNaN(invoiceId)) {
     throw new Error("Invalid Invoice ID");
   }
 
-  if (isSuccess) {
+  if (isSuccess && sessionId) {
     const { payment_status } =
       await stripe.checkout.sessions.retrieve(sessionId);
 
@@ -104,7 +103,7 @@ export default async function InvoicePage({
                     invoice.status === "open" && "bg-blue-500",
                     invoice.status === "paid" && "bg-green-600",
                     invoice.status === "void" && "bg-zinc-700",
-                    invoice.status === "uncollectible" && "bg-red-600",
+                    invoice.status === "uncollectible" && "bg-red-600"
                   )}
                 >
                   {invoice.status}
@@ -113,7 +112,6 @@ export default async function InvoicePage({
             </div>
 
             <p className="text-3xl mb-3">${(invoice.value / 100).toFixed(2)}</p>
-
             <p className="text-lg mb-8">{invoice.description}</p>
           </div>
           <div>

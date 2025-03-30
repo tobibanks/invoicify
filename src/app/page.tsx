@@ -1,7 +1,19 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, CreditCard, FileText, Zap, Mail, Wallet } from "lucide-react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card"
+import {
+  ArrowRight,
+  CreditCard,
+  FileText,
+  Mail,
+  Wallet,
+  Zap
+} from "lucide-react"
+import Link from "next/link"
 
 export default function Home() {
   return (
@@ -12,7 +24,8 @@ export default function Home() {
           Invoicify
         </h1>
         <p className="text-xl text-gray-600 text-center max-w-2xl mb-8">
-          Create and send professional invoices in seconds. Get paid faster with integrated payment processing.
+          Create and send professional invoices in seconds. Get paid faster with
+          integrated payment processing.
         </p>
         <Button size="lg" asChild className="h-12 px-8">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -26,7 +39,7 @@ export default function Home() {
         <h2 className="text-3xl font-semibold text-center mb-12">
           Everything you need to manage invoices
         </h2>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <Card>
             <CardHeader>
@@ -66,14 +79,15 @@ export default function Home() {
           <h2 className="text-3xl font-semibold text-center mb-8">
             Flexible Payment Options
           </h2>
-          
+
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
             <Card className="w-full md:w-80">
               <CardHeader className="items-center">
                 <CreditCard className="w-12 h-12 text-purple-500 mb-2" />
                 <CardTitle>Stripe Payments</CardTitle>
                 <CardDescription className="text-center">
-                  Accept credit cards and more with Stripe's secure payment processing
+                  Accept credit cards and more with Stripe's secure payment
+                  processing
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -98,7 +112,8 @@ export default function Home() {
             Ready to streamline your invoicing?
           </h2>
           <p className="text-gray-600 mb-8">
-            Join thousands of businesses using Invoicify to manage their invoices and get paid faster.
+            Join thousands of businesses using Invoicify to manage their
+            invoices and get paid faster.
           </p>
           <Button size="lg" asChild className="h-12 px-8">
             <Link href="/dashboard">Start Now</Link>
@@ -106,5 +121,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  );
+  )
 }

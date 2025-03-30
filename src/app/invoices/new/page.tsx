@@ -1,31 +1,31 @@
-"use client";
+"use client"
 
-import Form from "next/form";
-import { type SyntheticEvent, useState } from "react";
+import Form from "next/form"
+import { type SyntheticEvent, useState } from "react"
 
-import Container from "@/components/Container";
-import SubmitButton from "@/components/SubmitButton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import Container from "@/components/Container"
+import SubmitButton from "@/components/SubmitButton"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
-import { createAction } from "@/app/actions";
+import { createAction } from "@/app/actions"
 
 export default function Home() {
-  const [state, setState] = useState("ready");
-  const [error, setError] = useState<string>();
+  const [state] = useState("ready")
+  const [error] = useState<string>()
 
   async function handleOnSubmit(event: SyntheticEvent) {
     // Submission disabled for demo
-  //  event.preventDefault();
-   // setError('Submission disabled for demo.');
-   // return;
+    //  event.preventDefault();
+    // setError('Submission disabled for demo.');
+    // return;
 
     if (state === "pending") {
-      event.preventDefault();
-      return;
+      event.preventDefault()
+      return
     }
-   // setState("pending");
+    // setState("pending");
   }
 
   return (
@@ -33,7 +33,7 @@ export default function Home() {
       <Container>
         {error && (
           <p className="bg-red-100 text-sm text-red-800 text-center px-3 py-2 rounded-lg mb-6">
-            { error }
+            {error}
           </p>
         )}
         <div className="flex justify-between mb-6">
@@ -78,5 +78,5 @@ export default function Home() {
         </Form>
       </Container>
     </main>
-  );
+  )
 }

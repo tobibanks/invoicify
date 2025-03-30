@@ -1,13 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { and, eq, isNull } from "drizzle-orm";
-import { CirclePlus } from "lucide-react";
+import { auth } from "@clerk/nextjs/server"
+import { and, eq, isNull } from "drizzle-orm"
+import { CirclePlus } from "lucide-react"
 
-import { db } from "@/db";
-import { Customers, Invoices } from "@/db/schema";
+import { db } from "@/db"
+import { Customers, Invoices } from "@/db/schema"
 
-import Container from "@/components/Container";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import Container from "@/components/Container"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -15,53 +15,51 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import Invoice from '../invoices/[invoiceId]/Invoice';
+  TableRow
+} from "@/components/ui/table"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 export default async function Home() {
-  const { userId, orgId } = auth();
+  const { userId, orgId } = auth()
 
-  if (!userId) return;
+  if (!userId) return
 
   // Displaying all invoices for public demo
 
   let results: Array<{
-    invoices: typeof Invoices.$inferSelect;
-    customers: typeof Customers.$inferSelect;
+    invoices: typeof Invoices.$inferSelect
+    customers: typeof Customers.$inferSelect
   }> = await db
     .select()
     .from(Invoices)
-    .innerJoin(Customers, eq(Invoices.customerId, Customers.id));
+    .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
 
   if (orgId) {
     results = await db
       .select()
       .from(Invoices)
       .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
-      .where(eq(Invoices.organizationId, orgId));
+      .where(eq(Invoices.organizationId, orgId))
   } else {
     results = await db
       .select()
       .from(Invoices)
       .innerJoin(Customers, eq(Invoices.customerId, Customers.id))
-      .where(and(eq(Invoices.userId, userId), isNull(Invoices.organizationId)));
+      .where(and(eq(Invoices.userId, userId), isNull(Invoices.organizationId)))
   }
 
   const invoices = results?.map(({ invoices, customers }) => {
     return {
       ...invoices,
-      customer: customers,
-    };
-  });
+      customer: customers
+    }
+  })
   console.log(results)
 
   return (
     <main className="h-full">
       <Container>
-      
         <div className="flex justify-between mb-6">
           <h1 className="text-3xl font-semibold">Invoices</h1>
           <p>
@@ -118,7 +116,7 @@ export default async function Home() {
                           result.status === "open" && "bg-blue-500",
                           result.status === "paid" && "bg-green-600",
                           result.status === "void" && "bg-zinc-700",
-                          result.status === "uncollectible" && "bg-red-600",
+                          result.status === "uncollectible" && "bg-red-600"
                         )}
                       >
                         {result.status}
@@ -142,11 +140,11 @@ export default async function Home() {
                     </Link>
                   </TableCell>
                 </TableRow>
-              );
+              )
             })}
           </TableBody>
         </Table>
       </Container>
     </main>
-  );
+  )
 }

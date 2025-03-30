@@ -1,9 +1,9 @@
-"use client";
-import { useState } from "react";
-import { ChevronDown, CreditCard, Ellipsis, Trash2 } from "lucide-react";
-import { useOptimistic } from "react";
-import Container from "@/components/Container";
-import { Badge } from "@/components/ui/badge";
+"use client"
+
+import {ChevronDown,CreditCard,Ellipsis,Trash2} from "lucide-react"
+import { useOptimistic } from "react"
+import Container from "@/components/Container"
+import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
   DialogContent,
@@ -11,44 +11,44 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  DialogTrigger
+} from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { Customers, Invoices } from "@/db/schema";
-import { cn } from "@/lib/utils";
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import type { Customers, Invoices } from "@/db/schema"
+import { cn } from "@/lib/utils"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 
-import { deleteInvoiceAction, updateStatusAction } from "@/app/actions";
-import { AVAILABLE_STATUSES } from "@/data/invoices";
-import Link from "next/link";
+import { deleteInvoiceAction, updateStatusAction } from "@/app/actions"
+import { AVAILABLE_STATUSES } from "@/data/invoices"
+import Link from "next/link"
 
 interface InvoiceProps {
   invoice: typeof Invoices.$inferSelect & {
-    customer: typeof Customers.$inferSelect;
-  };
+    customer: typeof Customers.$inferSelect
+  }
 }
 
 export default function Invoice({ invoice }: InvoiceProps) {
   const [currentStatus, setCurrentStatus] = useOptimistic(
     invoice.status,
     (_state, newStatus) => String(newStatus)
-  );
+  )
 
   async function handleOnUpdateStatus(formData: FormData) {
-    const originalStatus = currentStatus;
-    const newStatus = formData.get("status");
-    setCurrentStatus(newStatus);
+    const originalStatus = currentStatus
+    const newStatus = formData.get("status")
+    setCurrentStatus(newStatus)
 
     try {
-      await updateStatusAction(formData);
+      await updateStatusAction(formData)
     } catch {
-      setCurrentStatus(originalStatus);
+      setCurrentStatus(originalStatus)
     }
   }
 
@@ -64,7 +64,7 @@ export default function Invoice({ invoice }: InvoiceProps) {
                 currentStatus === "open" && "bg-blue-500",
                 currentStatus === "paid" && "bg-green-600",
                 currentStatus === "void" && "bg-zinc-700",
-                currentStatus === "uncollectible" && "bg-red-600",
+                currentStatus === "uncollectible" && "bg-red-600"
               )}
             >
               {currentStatus}
@@ -92,10 +92,10 @@ export default function Invoice({ invoice }: InvoiceProps) {
                       <button
                         type="submit"
                         onClick={async (e) => {
-                          e.preventDefault();
-                          const form = e.currentTarget.form;
-                          if (!form) return;
-                          await handleOnUpdateStatus(new FormData(form));
+                          e.preventDefault()
+                          const form = e.currentTarget.form
+                          if (!form) return
+                          await handleOnUpdateStatus(new FormData(form))
                         }}
                       >
                         {status.label}
@@ -153,8 +153,8 @@ export default function Invoice({ invoice }: InvoiceProps) {
                     <form
                       className="flex justify-center"
                       onSubmit={async (e) => {
-                        e.preventDefault();
-                        await deleteInvoiceAction(new FormData(e.currentTarget));
+                        e.preventDefault()
+                        await deleteInvoiceAction(new FormData(e.currentTarget))
                       }}
                     >
                       <input type="hidden" name="id" value={invoice.id} />
@@ -208,5 +208,5 @@ export default function Invoice({ invoice }: InvoiceProps) {
         </ul>
       </Container>
     </main>
-  );
+  )
 }

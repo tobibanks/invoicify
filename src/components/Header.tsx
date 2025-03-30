@@ -1,12 +1,12 @@
-import Container from "@/components/Container";
+import Container from "@/components/Container"
 import {
   OrganizationSwitcher,
   SignInButton,
   SignedIn,
   SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import Link from "next/link";
+  UserButton
+} from "@clerk/nextjs"
+import Link from "next/link"
 
 const Header = () => {
   return (
@@ -35,7 +35,7 @@ const Header = () => {
         </div>
       </Container>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

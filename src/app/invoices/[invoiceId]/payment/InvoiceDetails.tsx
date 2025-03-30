@@ -34,4 +34,5 @@ export function InvoiceDetails({ invoice }: InvoiceDetailsProps) {
       <p className="text-lg mb-8">{invoice.description}</p>
     </div>
   );
+  
 }
