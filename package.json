@@ -29,6 +29,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.3",
+    "eslint": "^9.22.0",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.441.0",
     "next": "^15.0.0-canary.155",
@@ -38,7 +39,8 @@
     "resend": "^4.0.0",
     "stripe": "^16.12.0",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.2",
